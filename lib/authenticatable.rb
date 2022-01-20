@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "authenticatable/engine"
+
 require "dry-configurable"
 require "warden"
 
@@ -9,8 +10,13 @@ require "warden"
 module Authenticatable
   extend Dry::Configurable
 
+  autoload :Helpers, "authenticatable/helpers"
   autoload :Models, "authenticatable/models"
 
+  module Strategies
+    autoload :Base, "authenticatable/strategies/base"
+    autoload :Password, "authenticatable/strategies/password"
+  end
   # Default extensions to load into your authenticatable models. Feel free to develop
   # add publish your own extensions online. We'd be happy to see what you can accomplish.
   #
@@ -26,3 +32,6 @@ module Authenticatable
     end
   end
 end
+
+# Register Warden strategies.
+Warden::Strategies.add(:password, Authenticatable::Strategies::Password)

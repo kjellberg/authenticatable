@@ -1,12 +1,21 @@
 # frozen_string_literal: true
 
+require "warden"
+
 module Authenticatable
   # Makes Authenticatable available to Rails on initializing by injecting the
   # Authenticatable manager into Rack middlewares.
   class Engine < ::Rails::Engine
-    # config.app_middleware.use(Authenticatable::Manager)
+    config.app_middleware.use Warden::Manager do |manager|
+      manager.failure_app = proc do |_env|
+        ["401", { "Content-Type" => "application/json" }, { error: "Unauthorized", code: 401 }]
+      end
+      manager.default_strategies :password # needs to be defined
+    end
 
     initializer "authenticatable.setup" do
+      config.autoload_paths += %W[#{Authenticatable::Engine.root}/lib/authenticatable]
+
       # Make authenticatable helpers available on controllers.
       # ActionController::Base.include Authenticatable::Mixins::Controller
 
