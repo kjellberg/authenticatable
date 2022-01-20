@@ -4,4 +4,38 @@ Authenticatable
 [![RSpec](https://github.com/kiqr/authenticatable/actions/workflows/rspec.yml/badge.svg)](https://github.com/kiqr/authenticatable/actions/workflows/rspec.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
 
-An authentication solution for Rails that extends Rails built-in [has_secure_password](https://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html) with controller helpers and *security features*.
+An authentication solution for Ruby on Rails that extends [Warden](https://github.com/wardencommunity/warden)'s Rack layer with extra **security features**, strategies and helpers.
+
+Installation
+------------
+
+Add the following line to Gemfile:
+
+```ruby
+gem "authenticatable", "~> 2.0"
+```
+
+and run `bundle install` from your terminal to install it.
+
+Contributing
+------------
+If you are interested in reporting/fixing issues and contributing directly to the code base, please see [CONTRIBUTING.md](CONTRIBUTING.md) for more information on what we're looking for and how to get started.
+
+Versioning
+----------
+This library aims to adhere to [Semantic Versioning](http://semver.org/). Violations
+of this scheme should be reported as bugs. Specifically, if a minor or patch
+version is released that breaks backward compatibility, that version should be
+immediately yanked and/or a new version should be immediately released that
+restores compatibility. Breaking changes to the public API will only be
+introduced with new major versions. As a result of this policy, you can (and
+should) specify a dependency on this gem using the [Pessimistic Version
+Constraint](http://guides.rubygems.org/patterns/#pessimistic-version-constraint) with two digits of precision. For example:
+
+```ruby
+gem "authenticatable", "~> 2.0"
+```
+
+License
+-------
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
