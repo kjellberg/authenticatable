@@ -7,11 +7,6 @@ module Authenticatable
     let(:user) { create(:user) }
     let(:admin) { create(:admin) }
 
-    before do
-      described_class.define_helpers :user
-      described_class.define_helpers :admin
-    end
-
     describe "generates scopes helper methods" do
       it { expect(ApplicationController.instance_methods).to include :current_user, :user_signed_in? }
       it { expect(ApplicationController.instance_methods).to include :current_admin, :admin_signed_in? }

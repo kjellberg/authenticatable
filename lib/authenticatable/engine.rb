@@ -17,7 +17,10 @@ module Authenticatable
       config.autoload_paths += %W[#{Authenticatable::Engine.root}/lib/authenticatable]
 
       # Make authenticatable helpers available on controllers.
-      # ActionController::Base.include Authenticatable::Mixins::Controller
+      ActionController::Base.include Authenticatable::Helpers
+
+      # Register pre defined scopes and generate helpers like user_signed_in? and current_user for the model.
+      Authenticatable.config.scopes.each { |scope| Authenticatable::Helpers.define_helpers scope }
 
       # Make authenticatable method available on models.
       ActiveRecord::Base.include Authenticatable::Models

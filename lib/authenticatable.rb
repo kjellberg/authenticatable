@@ -18,9 +18,11 @@ module Authenticatable
     autoload :Password, "authenticatable/strategies/password"
   end
 
+  # List of authenticatable model scopes for generation of helpers and strategies.
+  setting :scopes, %i[user admin]
+
   # Default extensions to load into your authenticatable models. Feel free to develop
   # add publish your own extensions online. We'd be happy to see what you can accomplish.
-  #
   setting :default_extensions, %i[]
 
   # Range validation for password length
@@ -30,6 +32,25 @@ module Authenticatable
     # Reset Authenticatable configurations to default values.
     def reset_default_values!
       remove_instance_variable :@config
+    end
+  end
+end
+
+module Warden
+  class SessionSerializer
+    def serialize(user)
+      [user.class.name, user.id]
+    end
+
+    def deserialize(key)
+      klass, id = key
+      klass = case klass
+              when Class
+                klass
+              when String, Symbol
+                klass.to_s.classify.constantize
+              end
+      klass.find_by(id: id)
     end
   end
 end
