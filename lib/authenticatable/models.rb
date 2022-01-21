@@ -30,6 +30,12 @@ module Authenticatable
         load_model_extensions
       end
 
+      # Returns a symbol representing this model.
+      # :api: public
+      def to_scope
+        name.demodulize.underscore.to_sym
+      end
+
       private
 
       # Loads extension concerns/mixins into the model class if it can find a module with

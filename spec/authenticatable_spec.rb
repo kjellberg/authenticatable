@@ -15,7 +15,7 @@ describe Authenticatable do
   end
 
   describe "configuration default values" do
-    it { expect(described_class.config.default_extensions).to eq(%i[warden]) }
+    it { expect(described_class.config.default_extensions).to eq(%i[]) }
     it { expect(described_class.config.password_length).to eq(6..128) }
   end
 end

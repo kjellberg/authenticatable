@@ -17,10 +17,11 @@ module Authenticatable
     autoload :Base, "authenticatable/strategies/base"
     autoload :Password, "authenticatable/strategies/password"
   end
+
   # Default extensions to load into your authenticatable models. Feel free to develop
   # add publish your own extensions online. We'd be happy to see what you can accomplish.
   #
-  setting :default_extensions, %i[warden]
+  setting :default_extensions, %i[]
 
   # Range validation for password length
   setting :password_length, 6..128

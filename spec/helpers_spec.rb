@@ -2,56 +2,72 @@
 
 require "spec_helper"
 
-class MockController < ApplicationController
-  include Authenticatable::Helpers
-  attr_accessor :env
-
-  def request
-    self
-  end
-end
-
 module Authenticatable
   describe Helpers, type: :request do
-    include Warden::Test::Helpers
     let(:user) { create(:user) }
+    let(:admin) { create(:admin) }
 
-    describe "generates scopes helper methods" do
-      it { expect(MockController.instance_methods).to include :current_user, :user_signed_in? }
-      it { expect(MockController.instance_methods).to include :sign_in!, :sign_out! }
+    before do
+      described_class.define_helpers :user
+      described_class.define_helpers :admin
     end
 
-    describe "#current_user", type: :request do
+    describe "generates scopes helper methods" do
+      it { expect(ApplicationController.instance_methods).to include :current_user, :user_signed_in? }
+      it { expect(ApplicationController.instance_methods).to include :current_admin, :admin_signed_in? }
+      it { expect(ApplicationController.instance_methods).to include :sign_in!, :sign_out! }
+    end
+
+    describe "#current_{scope}", type: :request do
       before { get "/" }
 
       it { expect(@controller.current_user).to be nil }
 
-      it "does return the logged in user" do
+      it "does return a logged in user" do
         @controller.warden.set_user user, scope: :user
         expect(@controller.current_user).to be user
       end
 
-      it "does not return a user after signing out" do
-        @controller.warden.set_user user, scope: :user
-        @controller.sign_out!
-        expect(@controller.current_user).to be nil
+      it "does return a logged in admin" do
+        @controller.warden.set_user admin, scope: :admin
+        expect(@controller.current_admin).to be admin
+      end
+
+      it "runs authenticate on Warden" do
+        allow(@controller.warden).to receive(:authenticate)
+        @controller.current_user
+        expect(@controller.warden).to have_received(:authenticate).with(scope: :user)
+      end
+
+      it "runs authenticate on Warden with correct scope" do
+        allow(@controller.warden).to receive(:authenticate)
+        @controller.current_admin
+        expect(@controller.warden).to have_received(:authenticate).with(scope: :admin)
       end
     end
 
-    describe "#user_signed_in?", type: :request do
+    describe "{scope}_signed_in?", type: :request do
       before { get "/" }
 
       it { expect(@controller.user_signed_in?).to be false }
 
-      it "does return the logged in user" do
+      it "does find that user is logged in" do
         @controller.warden.set_user user, scope: :user
         expect(@controller.user_signed_in?).to be true
       end
 
-      it "does return false signing out" do
-        @controller.warden.set_user user, scope: :user
-        @controller.sign_out!
-        expect(@controller.user_signed_in?).to be false
+      it "does find that admin is logged in" do
+        @controller.warden.set_user admin, scope: :admin
+        expect(@controller.admin_signed_in?).to be true
+      end
+
+      context "when handling multiple scopes" do
+        before do
+          @controller.warden.set_user admin, scope: :admin
+        end
+
+        it { expect(@controller.user_signed_in?).to be false }
+        it { expect(@controller.admin_signed_in?).to be true }
       end
     end
 
@@ -62,21 +78,46 @@ module Authenticatable
         @controller.sign_in! user
         expect(@controller.warden.user(scope: :user)).to be user
       end
+
+      it "can sign in an admin from resource" do
+        @controller.sign_in! admin
+        expect(@controller.warden.user(scope: :admin)).to be admin
+      end
+
+      context "when signing in multiple scopes" do
+        before do
+          @controller.warden.set_user user, scope: :user
+          @controller.warden.set_user admin, scope: :admin
+        end
+
+        it { expect(@controller.warden.user(scope: :user)).to be user }
+        it { expect(@controller.warden.user(scope: :admin)).to be admin }
+      end
     end
 
     describe "#sign_out!", type: :request do
       before { get "/" }
 
-      it "can logout all users" do
-        @controller.warden.set_user user, scope: :user
-        @controller.sign_out!
-        expect(@controller.user_signed_in?).to be false
+      context "when logging out all scopes" do
+        before do
+          @controller.warden.set_user user, scope: :user
+          @controller.warden.set_user admin, scope: :admin
+          @controller.sign_out!
+        end
+
+        it { expect(@controller.warden.authenticated?(:user)).to be false }
+        it { expect(@controller.warden.authenticated?(:admin)).to be false }
       end
 
-      it "can logout by scope" do
-        @controller.warden.set_user user, scope: :user
-        @controller.sign_out! :user
-        expect(@controller.user_signed_in?).to be false
+      context "when logging out a specific scope" do
+        before do
+          @controller.warden.set_user user, scope: :user
+          @controller.warden.set_user admin, scope: :admin
+          @controller.sign_out! :admin
+        end
+
+        it { expect(@controller.warden.authenticated?(:user)).to be true }
+        it { expect(@controller.warden.authenticated?(:admin)).to be false }
       end
     end
   end
