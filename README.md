@@ -4,7 +4,7 @@ Authenticatable
 [![RSpec](https://github.com/kiqr/authenticatable/actions/workflows/rspec.yml/badge.svg)](https://github.com/kiqr/authenticatable/actions/workflows/rspec.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
 
-An authentication solution for Ruby on Rails that extends [Warden](https://github.com/wardencommunity/warden)'s Rack layer with extra **security features**, strategies and helpers.
+An authentication framework based on [Warden](https://github.com/wardencommunity/warden), that provides a set of **security features**, strategies and helpers to build your own customized authentication logic.
 
 Installation
 ------------
