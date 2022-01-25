@@ -17,6 +17,43 @@ gem "authenticatable", "~> 2.0"
 
 and run `bundle install` from your terminal to install it.
 
+Getting started
+---------------
+Start by generating the model that will act as the authenticatable resource. In most cases, this model will be based on a `User`-class, but it can be whatever you want. For example `Admin`, `Customer`, `Subscriber` or why not a `Banana`?
+
+Authenticatable does not require any specific attributes by default. However, if you want to be able to authenticate a user by password, you should at least include an `:email` and a `:password_digest` field.
+
+#### Create a User model prepared for email & password authentication
+```console
+$ rails g model banana email:uniq password_digest
+```
+
+#### Register the `user` scope with Authenticatable
+```ruby
+# app/config/initializers/authenticatable.rb
+Authenticatable.setup |config| do
+  config.scopes = [:user]
+end
+```
+
+### Helpers
+
+After the steps above as been done, you should have access to the following helpers:
+
+#### Signing in a user.
+```ruby
+sign_in!(@user) # => true|false
+```
+
+#### Retrieving the current authenticated user.
+```ruby
+current_user # => <User>|nil
+```
+
+#### Check if a user is authenticated.
+```ruby
+user_signed_in? # => true|false
+```
 
 Examples
 --------
@@ -24,11 +61,11 @@ All examples below expects that you've already configured an authenticatable mod
 
 #### Signing in with email & password
 ```ruby
-user = User.find_by(email: params[:email])
+@user = User.find_by(email: params[:email])
 
-if user&.authenticate(params[:password])
-  sign_in!(user)
-  redirect_to user_path(user), notice: "You've signed in!"
+if @user&.authenticate(params[:password])
+  sign_in!(@user)
+  redirect_to user_path(@user), notice: "You've signed in!"
 else
   flash.now[:alert] = "Wrong username or credentials"
   render :new
@@ -47,16 +84,6 @@ class SessionsController < ApplicationController
     redirect_to user_path(@user)
   end
 end
-```
-
-#### Retrieving the current authenticated user.
-```ruby
-current_user => <User>|nil
-```
-
-#### Check if a user is authenticated.
-```ruby
-user_signed_in? => true|false
 ```
 
 Contributing
