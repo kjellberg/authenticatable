@@ -23,22 +23,23 @@ Start by generating the model that will act as the authenticatable resource. In 
 
 Authenticatable does not require any specific attributes by default. However, if you want to be able to authenticate a user by password, you should at least include an `:email` and a `:password_digest` field.
 
-#### Create a User model prepared for email & password authentication
+### The user model
+Generate a `User` model with the fields required for email and password authentication:
 ```console
-$ rails g model banana email:uniq password_digest
+$ rails g model user email:uniq password_digest
 ```
 
-#### Register the `user` scope with Authenticatable
+### Register the scope
+Make sure to register the scope representing your model in the initializer file `config/initializers/authenticatable.rb`. The default value is `%i[user admin]` which means that you can skip this step if your model is `User`.
 ```ruby
-# app/config/initializers/authenticatable.rb
 Authenticatable.setup |config| do
-  config.scopes = [:user]
+  config.scopes = %i[user admin]
 end
 ```
 
 ### Helpers
 
-After the steps above as been done, you should have access to the following helpers:
+Authenticatable will generate helpers for each scope in `Authenticatable.config.scopes` on initialization. If your model is something other than User, replace "_user" with "_yourmodel". 
 
 #### Signing in a user.
 ```ruby
@@ -57,7 +58,7 @@ user_signed_in? # => true|false
 
 Examples
 --------
-All examples below expects that you've already configured an authenticatable model with class name `User` and scope `:user`.
+All examples below expects that you've already created an authenticatable model with class name `User` and scope `:user`.
 
 #### Signing in with email & password
 ```ruby
