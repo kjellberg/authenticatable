@@ -19,27 +19,26 @@ and run `bundle install` from your terminal to install it.
 
 Getting started
 ---------------
-Start by generating the model that will act as the authenticatable resource. In most cases, this model will be based on a `User`-class, but it can be whatever you want. For example `Admin`, `Customer`, `Subscriber` or why not a `Banana`?
 
-Authenticatable does not require any specific attributes by default. However, if you want to be able to authenticate a user by password, you should at least include an `:email` and a `:password_digest` field.
-
-### The user model
+#### The user model
 Generate a `User` model with the fields required for email and password authentication:
 ```console
 $ rails g model user email:uniq password_digest
 ```
 
-### Register the scope
-Make sure to register the scope representing your model in the initializer file `config/initializers/authenticatable.rb`. The default value is `%i[user admin]` which means that you can skip this step if your model is `User`.
+_Authenticatable doesn't require any database columns by default. However, if you want to be able to authenticate a user by password, you should at least include an `:email` and a `:password_digest` field._
+
+#### Register the scope
+You need to register all scopes in the initializer file `config/initializers/authenticatable.rb`. The default value is `user` which means that you can skip this step if your user model is `User`.
 ```ruby
 Authenticatable.setup |config| do
-  config.scopes = %i[user admin]
+  config.scopes = %i[user]
 end
 ```
 
 ### Helpers
 
-Authenticatable will generate helpers for each scope in `Authenticatable.config.scopes` on initialization. If your model is something other than User, replace "_user" with "_yourmodel". 
+Authenticatable will generate helpers for each registered scope on initialization. If your model is something other than User, replace "_user" with "_yourmodel". 
 
 #### Signing in a user.
 ```ruby
